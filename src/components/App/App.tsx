@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchBar from "../SearchBar/SearchBar";
 import { fetchMovies } from "../../services/movieService";
 import toast, { Toaster } from "react-hot-toast";
@@ -45,6 +45,18 @@ export default function App() {
     setCurrentPage(1);
   };
 
+  useEffect(() => {
+    if (
+      isSuccess &&
+      movies.length === 0 &&
+      searchQuery &&
+      !isLoading &&
+      !isError
+    ) {
+      toast.error("No movies found for your request.");
+    }
+  }, [isSuccess, movies.length, searchQuery, isLoading, isError]);
+
   return (
     <div className={css.app}>
       <SearchBar onSubmit={handleSearch} />
@@ -61,14 +73,9 @@ export default function App() {
           previousLabel="←"
         />
       )}
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-      {movies.length === 0 &&
-        searchQuery &&
-        !isLoading &&
-        !isError &&
-        toast.error("No movies found for your request.")}
       {movies.length > 0 && (
         <MovieGrid movies={movies} onSelect={handleSelectMovie} />
       )}
